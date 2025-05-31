@@ -9,8 +9,6 @@
 
 #include "stdio.h"
 #include "scheduler.h"
-
-#include "mcp4902.h"
 #include "uart.h"
 #include "main.h"
 #include "ntc.h"
@@ -207,50 +205,6 @@ void auto_get_temp()
 
 		UART_SendStringRing(UART_CMDLINE, buffer);
 	}
-}
-
-void auto_set_pd(uint8_t pd_slot)
-{
-	if (pd_slot > (photo_sw.num_of_chain * photo_sw.dev.channel_per_dev))
-		return;
-	adg1414_Chain_SetSwChannel(&photo_sw, pd_slot);
-}
-
-void auto_set_ls(uint8_t ls_slot)
-{
-	if (ls_slot > (int_laser.num_of_chain * int_laser.dev.channel_per_dev))
-		return;
-	adg1414_Chain_SetSwChannel(&int_laser, ls_slot);
-}
-
-void read_adc(void)
-{
-	uint32_t result = 0;
-	float voltage = 0.0;
-	const float vref = 3.0;
-	int32_t voltage_int = 0, voltage_frac = 0;
-
-
-	result = ADS8327_Read_Data_Polling(&photo_adc);
-	voltage = (result / 65536.0f) * vref;
-
-	voltage_int = (int32_t)voltage;
-	voltage_frac = (int32_t)((voltage - voltage_int) * 1000);
-
-	char buffer[60];
-	snprintf(buffer, sizeof(buffer), "AutoADC: %ld (Vol: %ld.%03ld V)\r\n", result, voltage_int, voltage_frac);
-	UART_SendStringRing(UART_CMDLINE, buffer);
-}
-
-void read_adc_without_LF(void)
-{
-	uint16_t result = 0;
-
-	result = ADS8327_Read_Data_Polling(&photo_adc);
-
-	char buffer[50];
-	snprintf(buffer, sizeof(buffer), "  [T: %d]-[ADC: %d]", data_times, result);
-	UART_SendStringRing(UART_CMDLINE, buffer);
 }
 
 void AutoRun_CreateTask(void)

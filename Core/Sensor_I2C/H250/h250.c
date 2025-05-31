@@ -20,6 +20,14 @@ void H250_I2C_Read(uint8_t reg, uint8_t *pData, uint8_t length) {
 	H250_I2C_RawData.status = I2C_ReadMulti(EXP_I2C_SENSOR_HANDLE, H250_I2C_ADDR, reg, pData, length);
 }
 
+I2C_Status_t H250_I2C_Init(void) {
+	H250_I2C_Read(H250_REG, &H250_I2C_RawData.RxData[0], 7);
+	if (H250_I2C_RawData.RxData[0] == 0x08)
+		return H250_I2C_RawData.status;
+	else
+		return I2C_Error;
+}
+
 I2C_Status_t H250_I2C_Read_Data(H250_I2C_Data_t *H250_I2C_Data)
 {
 	H250_I2C_Read(H250_REG, &H250_I2C_RawData.RxData[0], 7);

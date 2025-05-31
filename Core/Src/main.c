@@ -34,13 +34,11 @@
 #include "i2c.h"
 #include "date_time.h"
 #include "auto_run.h"
-#include "laser_board.h"
-#include "photo_board.h"
 #include "mb85rs2mt.h"
 #include "lt8722.h"
 #include "cli_command.h"
-
 #include "lsm6dsox.h"
+#include "sfc5500.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -145,6 +143,8 @@ int main(void)
   NTC_DMA_ADC_Init();
   Sensor_I2C_Init();
   SCH_Initialize();
+
+  SFC5500_Init(&sfc_handle);
 
   // Create task scheduler
   Ex_Watchdog_CreateTask();

@@ -42,6 +42,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h \
  D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Common/basetypedef.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/WDog/watchdog.h \
@@ -49,7 +53,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/NTC/ntc.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/temperature.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/sensor_i2c.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C/i2c.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/LSM6DSOX/lsm6dsox.h \
@@ -63,12 +66,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C_Slave/register.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/DateTime/date_time.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Auto_run/auto_run.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/LASER_BOARD/laser_board.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/LASER_BOARD/MCP4902/mcp4902.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/photo_board.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/ADS8327/ads8327.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/CLI_Terminal/CLI_Command/cli_command.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/CLI_Terminal/CLI_Src/embedded_cli.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/CLI_Terminal/CLI_Setup/cli_setup.h
@@ -116,6 +113,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h:
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h:
 D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Common/basetypedef.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/WDog/watchdog.h:
@@ -123,7 +124,6 @@ D:/STworkspace/EXP_V110_STANDALONE/Core/LED/Status_LED/status_led.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/NTC/ntc.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/temperature.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/sensor_i2c.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C/i2c.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/LSM6DSOX/lsm6dsox.h:
@@ -137,12 +137,6 @@ D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C_Slave/i2c_slave.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C_Slave/register.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/DateTime/date_time.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Auto_run/auto_run.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/LASER_BOARD/laser_board.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/LASER_BOARD/MCP4902/mcp4902.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/photo_board.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/ADS8327/ads8327.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/CLI_Terminal/CLI_Command/cli_command.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/CLI_Terminal/CLI_Src/embedded_cli.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/CLI_Terminal/CLI_Setup/cli_setup.h:

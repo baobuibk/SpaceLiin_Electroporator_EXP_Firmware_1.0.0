@@ -48,6 +48,10 @@ Core/Sensor_I2C/sensor_i2c.o: ../Core/Sensor_I2C/sensor_i2c.c \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/BME280/bme280.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/H3LIS331DL/h3lis331dl.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/H250/h250.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h \
@@ -101,6 +105,10 @@ D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/BMP390/bmp390.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/BME280/bme280.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h:
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/H3LIS331DL/h3lis331dl.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/H250/h250.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h:

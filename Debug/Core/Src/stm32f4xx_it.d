@@ -41,15 +41,17 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usart.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h \
  ../Core/Inc/stm32f4xx_it.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h \
+ ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h \
  D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Common/basetypedef.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C_Slave/i2c_slave.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C_Slave/register.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/ADS8327/ads8327.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/H250/h250.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h \
- ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C/i2c.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h
 ../Core/Inc/main.h:
@@ -95,14 +97,16 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usart.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h:
 ../Core/Inc/stm32f4xx_it.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h:
+../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h:
 D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Common/basetypedef.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C_Slave/i2c_slave.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C_Slave/register.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/ADS8327/ads8327.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/H250/h250.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h:
-../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C/i2c.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h:

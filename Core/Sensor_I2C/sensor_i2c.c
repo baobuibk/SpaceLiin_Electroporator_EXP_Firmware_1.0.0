@@ -35,16 +35,38 @@ K33_Data_t K33_Data = {
 		.RH = 0
 };
 
+Sens_List_Status_t Sensor_list = {
+		.ntc = 0,
+		.lsm = 0,
+		.bmp = 0,
+		.bme = 0,
+		.h3l = 0,
+		.h250 = 0,
+		.k33 = 0,
+		.sfc = 0,
+};
+
 void  Sensor_I2C_Init(void) {
 	LL_GPIO_SetOutputPin(SENSOR1_EN_GPIO_Port, SENSOR1_EN_Pin);
 	LL_GPIO_SetOutputPin(SENSOR2_EN_GPIO_Port, SENSOR2_EN_Pin);
-	I2C_Status_t I2C_status = I2C_Success;
+	I2C_Status_t I2C_status = I2C_Error;
+
 	I2C_status = LSM6DSOX_Init();
-	if (I2C_status == I2C_Error) UART_SendStringRing(EXP_UART_CONSOLE_HANDLE, "LSM6DSOX is error \r\n");
+	if (I2C_status == I2C_Success) Sensor_list.lsm = 1;
+	else Sensor_list.lsm = 0;
+
 	I2C_status = BME280_Init();
-	if (I2C_status == I2C_Error) UART_SendStringRing(EXP_UART_CONSOLE_HANDLE, "BME280 is error \r\n");
+	if (I2C_status == I2C_Success) Sensor_list.bme = 1;
+	else Sensor_list.bme = 0;
+
 	I2C_status = H3LIS331DL_Init();
-	if (I2C_status == I2C_Error) UART_SendStringRing(EXP_UART_CONSOLE_HANDLE, "H3LIS331DL is error \r\n");
+	if (I2C_status == I2C_Success) Sensor_list.h3l = 1;
+	else Sensor_list.h3l = 0;
+
+	I2C_status = H250_I2C_Init();
+	if (I2C_status == I2C_Success) Sensor_list.h250 = 1;
+	else Sensor_list.h250 = 0;
+
 
 #ifdef H250_UART
 	H250_UART_Init(EXP_UART_CO2_HANDLE);

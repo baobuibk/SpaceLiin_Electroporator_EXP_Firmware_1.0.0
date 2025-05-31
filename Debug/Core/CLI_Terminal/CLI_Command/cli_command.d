@@ -34,7 +34,11 @@ Core/CLI_Terminal/CLI_Command/cli_command.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h ../Core/Inc/main.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_spi.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h \
+ ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_adc.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_dma.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_i2c.h \
@@ -45,9 +49,10 @@ Core/CLI_Terminal/CLI_Command/cli_command.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_cortex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_utils.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_pwr.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h \
  D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/sensor_i2c.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C/i2c.h \
@@ -58,7 +63,6 @@ Core/CLI_Terminal/CLI_Command/cli_command.o: \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/H250/h250.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/K33/k33.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/NTC/ntc.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/temperature.h
 ../Core/CLI_Terminal/CLI_Command/cli_command.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/CLI_Terminal/CLI_Src/embedded_cli.h:
@@ -95,6 +99,9 @@ D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_spi.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_adc.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_dma.h:
@@ -106,9 +113,10 @@ D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_cortex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_utils.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_pwr.h:
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_spi.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h:
 D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/sensor_i2c.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C/i2c.h:
@@ -119,5 +127,4 @@ D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/H3LIS331DL/h3lis331dl.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/H250/h250.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/K33/k33.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/NTC/ntc.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/temperature.h:

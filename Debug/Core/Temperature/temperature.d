@@ -44,6 +44,9 @@ Core/Temperature/temperature.o: ../Core/Temperature/temperature.c \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h \
  D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Common/basetypedef.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h \
@@ -97,6 +100,9 @@ Core/Temperature/temperature.o: ../Core/Temperature/temperature.c \
 D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h:
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h:
 D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Common/basetypedef.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h:

@@ -48,6 +48,10 @@ Core/LED/Status_LED/status_led.o: ../Core/LED/Status_LED/status_led.c \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C/i2c.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h \
+ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/BMP390/bmp390.h
 ../Core/LED/Status_LED/status_led.h:
 D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h:
@@ -99,4 +103,8 @@ D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/NTC/ntc.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/I2C/i2c.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Board/board.h:
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Temperature/LT8722/lt8722.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/MB85RS2MT/mb85rs2mt.h:
+D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/SFC5500/sfc5500.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Sensor_I2C/BMP390/bmp390.h:

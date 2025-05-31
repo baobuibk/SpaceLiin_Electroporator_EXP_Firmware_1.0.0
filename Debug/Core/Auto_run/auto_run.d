@@ -41,11 +41,6 @@ Core/Auto_run/auto_run.o: ../Core/Auto_run/auto_run.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usart.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/LASER_BOARD/laser_board.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/LASER_BOARD/MCP4902/mcp4902.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/photo_board.h \
- D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/ADS8327/ads8327.h \
  D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h \
  D:/STworkspace/EXP_V110_STANDALONE/Core/Common/basetypedef.h \
  D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h \
@@ -93,11 +88,6 @@ D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/../../Auto_run/auto_run.
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usart.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/LASER_BOARD/laser_board.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/Devices/ADG1414/adg1414.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/LASER_BOARD/MCP4902/mcp4902.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/photo_board.h:
-D:/STworkspace/EXP_V110_STANDALONE/Core/PHOTO_BOARD/ADS8327/ads8327.h:
 D:/STworkspace/EXP_V110_STANDALONE/Scheduler/scheduler.h:
 D:/STworkspace/EXP_V110_STANDALONE/Core/Common/basetypedef.h:
 D:/STworkspace/EXP_V110_STANDALONE/BSP/UART/uart.h:

@@ -8,6 +8,10 @@
 #ifndef BOARD_BOARD_H_
 #define BOARD_BOARD_H_
 #include <stm32f407xx.h>
+#include "lt8722.h"
+#include "adg1414.h"
+#include "mb85rs2mt.h"
+#include "sfc5500.h"
 
 //*****************************************************************************
 // UART_CONSOLE
@@ -50,5 +54,6 @@ extern struct lt8722_dev tec_3;
 extern struct lt8722_dev * tec_table[];
 extern struct mb85rs2mt_dev fram;
 extern struct adg1414_dev exp_adg1414;
+extern SFC5500_Handle_t sfc_handle;
 
 #endif /* BOARD_BOARD_H_ */

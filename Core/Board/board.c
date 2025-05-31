@@ -7,10 +7,6 @@
 
 
 #include "board.h"
-#include "lt8722.h"
-#include "adg1414.h"
-#include "ads8327.h"
-#include "mb85rs2mt.h"
 
 struct lt8722_dev tec_0 = {
 		  .hspi = SPI3,
@@ -73,4 +69,11 @@ struct adg1414_dev exp_adg1414 = {
 		  .cs_port = TEC_ADC_CS_GPIO_Port,
 		  .cs_pin = TEC_ADC_CS_Pin,
 		  .channel_per_dev = 4
+};
+
+SFC5500_Handle_t sfc_handle = {
+    .uart = USART1,
+    .de_port = EXP_RS485_DE_GPIO_Port,
+    .de_pin  = EXP_RS485_DE_Pin,
+    .slave_addr = SFC5500_SLAVE_ADDRESS
 };

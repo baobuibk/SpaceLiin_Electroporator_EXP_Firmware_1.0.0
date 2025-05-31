@@ -26,12 +26,9 @@ RM := rm -rf
 -include Core/Sensor_I2C/BMP390/subdir.mk
 -include Core/Sensor_I2C/BME280/subdir.mk
 -include Core/Sensor_I2C/subdir.mk
--include Core/PHOTO_BOARD/ADS8327/subdir.mk
--include Core/PHOTO_BOARD/subdir.mk
 -include Core/LED/Status_LED/subdir.mk
 -include Core/LED/IR_LED/subdir.mk
--include Core/LASER_BOARD/MCP4902/subdir.mk
--include Core/LASER_BOARD/subdir.mk
+-include Core/Devices/SFC5500/subdir.mk
 -include Core/Devices/MB85RS2MT/subdir.mk
 -include Core/Devices/ADG1414/subdir.mk
 -include Core/DateTime/subdir.mk

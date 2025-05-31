@@ -9,6 +9,9 @@
 #include "k33.h"
 #include "stm32f4xx_ll_utils.h"
 #include "stm32f4xx_ll_i2c.h"
+#include "uart.h"
+#include "stdio.h"
+
 
 static K33_RawData_t K33_RawData;
 
@@ -26,8 +29,8 @@ I2C_Status_t K33_I2C_Read_RAM(uint8_t RAM_Addr, uint8_t *pData, uint8_t NumOfByt
 	uint8_t NumOfByteWrite = 3;
 	uint8_t buf[NumOfByteWrite];
 	buf[0] = (uint8_t)(K33_READ_RAM_CMD | (NumOfBytes & 0x0F));
-	buf[1] = (uint8_t)(RAM_Addr & 0xFF00);
-	buf[2] = (uint8_t)(RAM_Addr & 0x00FF);
+	buf[1] = 0x00;
+	buf[2] = RAM_Addr;
 
 	uint32_t timeout = I2C_TIMEOUT;
 	while (LL_I2C_IsActiveFlag_BUSY(K33_I2C_HANDLE) && timeout--);
@@ -86,6 +89,10 @@ I2C_Status_t K33_I2C_Read_RAM(uint8_t RAM_Addr, uint8_t *pData, uint8_t NumOfByt
 		pData[i] = LL_I2C_ReceiveData8(K33_I2C_HANDLE);
 	}
 
+	char buffer[80];
+	snprintf(buffer, sizeof(buffer), "Start  0x%X   0x%X   0x%X   0x%X   0x%X  Stop Start  0x%X \r\n", K33_I2C_ADDR << 1, buf[0], buf[1], buf[2], CSum_Byte, (K33_I2C_ADDR << 1) | 1);
+	UART_SendStringRing(EXP_UART_CONSOLE_HANDLE, buffer);
+
 	return I2C_Success;
 }
 
@@ -93,8 +100,8 @@ I2C_Status_t K33_BGrCalib(void) {
 	uint8_t NumOfByteWrite = 5;
 	uint8_t buf[NumOfByteWrite];
 	buf[0] = (uint8_t)(K33_WRITE_RAM_CMD | (0x02 & 0x0F));
-	buf[1] = (uint8_t)(K33_RAM_CALIB_ADDR & 0xFF00);
-	buf[2] = (uint8_t)(K33_RAM_CALIB_ADDR & 0x00FF);
+	buf[1] = 0x00;
+	buf[2] = K33_RAM_CALIB_ADDR;
 	buf[3] = 0x7C;
 	buf[4] = 0x06;
 
@@ -156,8 +163,8 @@ I2C_Status_t K33_ZeroCalib(void) {
 	uint8_t NumOfByteWrite = 5;
 	uint8_t buf[NumOfByteWrite];
 	buf[0] = (uint8_t)(K33_WRITE_RAM_CMD | (0x02 & 0x0F));
-	buf[1] = (uint8_t)(K33_RAM_CALIB_ADDR & 0xFF00);
-	buf[2] = (uint8_t)(K33_RAM_CALIB_ADDR & 0x00FF);
+	buf[1] = 0x00;
+	buf[2] = K33_RAM_CALIB_ADDR;
 	buf[3] = 0x7C;
 	buf[4] = 0x07;
 
@@ -221,13 +228,28 @@ I2C_Status_t K33_Read_Data(K33_Data_t *K33_Data) {
 		K33_Data->CO2 = (K33_RawData.RxData[1] << 8) | K33_RawData.RxData[2];
 	else return K33_RawData.status;
 
+	char buffer[80];
+	snprintf(buffer, sizeof(buffer), "  0x%X   0x%X   0x%X   0x%X \r\n", K33_RawData.RxData[0], K33_RawData.RxData[1], K33_RawData.RxData[2], K33_RawData.RxData[3]);
+	UART_SendStringRing(EXP_UART_CONSOLE_HANDLE, buffer);
+
+	LL_mDelay(10);
+
 	K33_RawData.status = K33_I2C_Read_RAM(K33_RAM_TEMP_ADDR, K33_RawData.RxData, 2);
 	if (K33_RawData.status == I2C_Success)
 		K33_Data->Temp = (K33_RawData.RxData[1] << 8) | K33_RawData.RxData[2];
 	else return K33_RawData.status;
 
+	snprintf(buffer, sizeof(buffer), "  0x%X   0x%X   0x%X   0x%X \r\n", K33_RawData.RxData[0], K33_RawData.RxData[1], K33_RawData.RxData[2], K33_RawData.RxData[3]);
+	UART_SendStringRing(EXP_UART_CONSOLE_HANDLE, buffer);
+
+	LL_mDelay(10);
+
 	K33_RawData.status = K33_I2C_Read_RAM(K33_RAM_RH_ADDR, K33_RawData.RxData, 2);
 	if (K33_RawData.status == I2C_Success)
 		K33_Data->RH = (K33_RawData.RxData[1] << 8) | K33_RawData.RxData[2];
+
+	snprintf(buffer, sizeof(buffer), "  0x%X   0x%X   0x%X   0x%X \r\n", K33_RawData.RxData[0], K33_RawData.RxData[1], K33_RawData.RxData[2], K33_RawData.RxData[3]);
+	UART_SendStringRing(EXP_UART_CONSOLE_HANDLE, buffer);
+
 	return K33_RawData.status;
 }

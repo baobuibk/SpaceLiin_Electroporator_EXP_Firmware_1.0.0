@@ -29,6 +29,7 @@
 
 	typedef uint16_t H250_I2C_Data_t;
 
+	I2C_Status_t H250_I2C_Init(void);
 	I2C_Status_t H250_I2C_Read_Data(H250_I2C_Data_t *H250_Data);
 #endif
 

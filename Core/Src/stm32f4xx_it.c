@@ -22,11 +22,12 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "board.h"
 #include "scheduler.h"
 #include "i2c_slave.h"
-#include "ads8327.h"
 #include "adg1414.h"
 #include "h250.h"
+#include "sfc5500.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -191,8 +192,6 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 0 */
 	g_systick_count++;
 	SCH_RunSystemTickTimer();
-	if (ads8327_timeout > 0) ads8327_timeout--;
-	if (ads8327_timeout > 0) adg1414_timeout--;
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
@@ -242,7 +241,8 @@ void USART1_IRQHandler(void)
 
   /* USER CODE END USART1_IRQn 0 */
   /* USER CODE BEGIN USART1_IRQn 1 */
-	UART_Ring_ISR(USART1);
+//	UART_Ring_ISR(USART1);
+	SFC5500_UART_IRQHandler(&sfc_handle);
   /* USER CODE END USART1_IRQn 1 */
 }
 

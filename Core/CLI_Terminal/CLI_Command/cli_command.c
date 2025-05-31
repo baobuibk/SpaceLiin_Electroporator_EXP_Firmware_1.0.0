@@ -12,7 +12,10 @@
 #include "lt8722.h"
 #include "temperature.h"
 #include <stdlib.h>
+#include <string.h>
 #include "k33.h"
+#include "sfc5500.h"
+#include "board.h"
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct _CLI_Command_TaskContextTypedef_ {
@@ -59,11 +62,21 @@ static void CMD_HTR_Set_Auto(EmbeddedCli *cli, char *args, void *context);
 static void CMD_HTR_Get_Auto(EmbeddedCli *cli, char *args, void *context);
 static void CMD_Temp_Set_Auto(EmbeddedCli *cli, char *args, void *context);
 static void CMD_Temp_Get_Auto(EmbeddedCli *cli, char *args, void *context);
+
+static void CMD_Sens_List(EmbeddedCli *cli, char *args, void *context);
 static void CMD_LSMSens_Get(EmbeddedCli *cli, char *args, void *context);
 static void CMD_H3LSens_Get(EmbeddedCli *cli, char *args, void *context);
 static void CMD_BMESens_Get(EmbeddedCli *cli, char *args, void *context);
 static void CMD_H250Sens_Get(EmbeddedCli *cli, char *args, void *context);
 static void CMD_K33Sens_Get(EmbeddedCli *cli, char *args, void *context);
+
+static void CMD_Ref_Set_NFC(EmbeddedCli *cli, char *args, void *context);
+static void CMD_Ref_Get_NFC(EmbeddedCli *cli, char *args, void *context);
+static void CMD_SFC_Flow_Get(EmbeddedCli *cli, char *args, void *context);
+
+
+
+static void CMD_SFC_Dev_Inf(EmbeddedCli *cli, char *args, void *context);
 
 /*************************************************
  *                 Command  Array                *
@@ -78,41 +91,58 @@ static void CMD_K33Sens_Get(EmbeddedCli *cli, char *args, void *context);
 // - binding: Callback function that handles the command.
 
 static const CliCommandBinding cliStaticBindings_internal[] = {
-    { "Ultis", "help",        "Print list of commands [Firmware: 1]",                  false,  NULL, CMD_Help },
-    { "Ultis", "cls",         "Clears the console",                                   false,  NULL, CMD_Clear_CLI },
-    { "Ultis", "reset",       "Reset MCU",                                            false,  NULL, CMD_Reset },
+    // Common
+    { "Ultis", "help",         "Print list of all available CLI commands [Firmware: 1]", false,  NULL, CMD_Help },
+    { "Ultis", "cls",          "Clear the console output screen",                        false,  NULL, CMD_Clear_CLI },
+    { "Ultis", "reset",        "Perform MCU software reset",                             false,  NULL, CMD_Reset },
 
-    { "NTC",   "ntc_get_temp","Get NTC temperature at specified channel [0-7, a]",    true,   NULL, CMD_NTC_Get_Temp },
+    // NTC
+    { "NTC",   "ntc_get_temp", "Read temperature value from NTC sensor [ch: 0-7, a=all]", true,   NULL, CMD_NTC_Get_Temp },
 
-	{ "PWR",   "pwr_5v_set",  "Set PWR 5V Temp",		                             true,   NULL, CMD_PWR_5V_Set },
-	{ "PWR",   "pwr_5v_get",  "Get status of PWR 5V Temp",                             false,   NULL, CMD_PWR_5V_Get },
+    // Power
+    { "PWR",   "pwr_5v_set",   "Turn ON/OFF 5V power supply [0:OFF / 1:ON]",             true,   NULL, CMD_PWR_5V_Set },
+    { "PWR",   "pwr_5v_get",   "Read current state of 5V power supply",                  false,  NULL, CMD_PWR_5V_Get },
 
-    { "TEC",   "tec_init",    "Init TEC device [0-3, a]",                             true,   NULL, CMD_TEC_Init },
-    { "TEC",   "tec_volt_set","Set TEC voltage: tec[0-3]_volt [0.5~2.5V]",            true,   NULL, CMD_TEC_Set_Volt },
-    { "TEC",   "tec_volt_get","Return TEC current voltage [0-3, a]",					true,   NULL, CMD_TEC_Get_Volt },
-    { "TEC",   "tec_dir_set", "Set TEC direction: tec[0-3]_dir [0:cool / 1:heat]",    true,   NULL, CMD_TEC_Set_Dir },
-    { "TEC",   "tec_dir_get", "Return TEC current direction [0-3, a]",                true,   NULL, CMD_TEC_Get_Dir },
+    // TEC
+    { "TEC",   "tec_init",     "Initialize TEC driver for specified channel [0-3, a=all]", true,  NULL, CMD_TEC_Init },
+    { "TEC",   "tec_volt_set", "Set voltage for TEC channel: tec[0-3]_volt [500~2500mV]", true,  NULL, CMD_TEC_Set_Volt },
+    { "TEC",   "tec_volt_get", "Read current output voltage of TEC [0-3, a=all]",         true,  NULL, CMD_TEC_Get_Volt },
+    { "TEC",   "tec_dir_set",  "Set direction of TEC [0-3]: 0=Cooling, 1=Heating",        true,  NULL, CMD_TEC_Set_Dir },
+    { "TEC",   "tec_dir_get",  "Read direction setting of TEC [0-3, a=all]",              true,  NULL, CMD_TEC_Get_Dir },
 
-    { "Heater","htr_duty_set","Set heater duty cycle: htr[0-3]_duty [0~100%]",        true,   NULL, CMD_HTR_Set_Duty },
-    { "Heater","htr_duty_get","Return heater current duty cycle [0-3, a]",            true,   NULL, CMD_HTR_Get_Duty },
+    // Heater
+    { "Heater", "htr_duty_set","Set duty cycle for heater [0-3]: [0~100%]",              true,  NULL, CMD_HTR_Set_Duty },
+    { "Heater", "htr_duty_get","Read current duty cycle setting of heater [0-3, a=all]", true,  NULL, CMD_HTR_Get_Duty },
 
-    { "Ref",   "ref_temp_set","Set reference temperature (default: 37°C)",            true,   NULL, CMD_Ref_Set_Temp },
-    { "Ref",   "ref_temp_get","Return reference temperature",                         true,   NULL, CMD_Ref_Get_Temp },
-    { "Ref",   "ref_ntc_set", "Set NTC channel to compare with ref_temp [0-7]",       true,   NULL, CMD_Ref_Set_NTC },
-    { "Ref",   "ref_ntc_get", "Return selected NTC channel for control routine",      true,   NULL, CMD_Ref_Get_NTC },
+    // Reference temperature
+    { "Ref",   "ref_temp_set", "Set reference temperature for control logic (°C)",       true,  NULL, CMD_Ref_Set_Temp },
+    { "Ref",   "ref_temp_get", "Read current reference temperature setting",              true,  NULL, CMD_Ref_Get_Temp },
+    { "Ref",   "ref_ntc_set",  "Select NTC channel used for temperature feedback [0-7]",  true,  NULL, CMD_Ref_Set_NTC },
+    { "Ref",   "ref_ntc_get",  "Get currently selected NTC channel for control",          true,  NULL, CMD_Ref_Get_NTC },
 
-    { "Auto",  "auto_tec_set","Enable TECs for control: tec[0-3]_en [0/1]",           true,   NULL, CMD_TEC_Set_Auto },
-    { "Auto",  "auto_tec_get","Return selected TECs for control [0-3, a]",            true,   NULL, CMD_TEC_Get_Auto },
-    { "Auto",  "auto_htr_set","Enable heaters for control: htr[0-3]_en [0/1]",        true,   NULL, CMD_HTR_Set_Auto },
-    { "Auto",  "auto_htr_get","Return selected heaters for control [0-3, a]",         true,   NULL, CMD_HTR_Get_Auto },
-    { "Auto",  "auto_temp_set","Enable temperature control routine [0/1]",            true,   NULL, CMD_Temp_Set_Auto },
-    { "Auto",  "auto_temp_get","Return temperature control status",                   true,   NULL, CMD_Temp_Get_Auto },
+    // NFC (placeholder or future implementation)
+    { "Ref",   "ref_nfc_set",  "Set NFC reference configuration [reserved]",              true,  NULL, CMD_Ref_Set_NFC },
+    { "Ref",   "ref_nfc_get",  "Read NFC reference configuration [reserved]",             true,  NULL, CMD_Ref_Get_NFC },
 
-    { "Sensor","lsm_sens_get","LSM6DSOX data: 0=temp+acc+gyro, 1=acc, 2=gyro",        true,   NULL, CMD_LSMSens_Get },
-    { "Sensor","h3l_sens_get","Return H3LIS331 high-g acceleration data",             true,   NULL, CMD_H3LSens_Get },
-    { "Sensor","bme_sens_get","BME280 data: 0=all, 1=temp, 2=RH, 3=pressure",          true,   NULL, CMD_BMESens_Get },
-    { "Sensor","h250_sens_get","Return H-250(G)-3V CO2 sensor data",                  false,   NULL, CMD_H250Sens_Get },
-	{ "Sensor","k33_sens_get","Return K33 ICB-F 10% sensor data",                  		true,   NULL, CMD_K33Sens_Get },
+    // Automatic control
+    { "Auto",  "auto_tec_set", "Enable/disable TECs for auto control [tecX_en 0/1]",      true,  NULL, CMD_TEC_Set_Auto },
+    { "Auto",  "auto_tec_get", "List enabled TEC channels for auto control [0-3, a]",     true,  NULL, CMD_TEC_Get_Auto },
+    { "Auto",  "auto_htr_set", "Enable/disable heaters for auto control [htrX_en 0/1]",   true,  NULL, CMD_HTR_Set_Auto },
+    { "Auto",  "auto_htr_get", "List enabled heater channels for auto control [0-3, a]",  true,  NULL, CMD_HTR_Get_Auto },
+    { "Auto",  "auto_temp_set","Enable/disable full temperature control routine [0/1]",   true,  NULL, CMD_Temp_Set_Auto },
+    { "Auto",  "auto_temp_get","Read current state of temperature control routine",       true,  NULL, CMD_Temp_Get_Auto },
+
+    // Sensors
+    { "Sensor","sens_list",    "List all available connected sensors",                    true,  NULL, CMD_Sens_List },
+    { "Sensor","lsm_sens_get", "Read LSM6DSOX data [0=all, 1=acc, 2=gyro]",               true,  NULL, CMD_LSMSens_Get },
+    { "Sensor","h3l_sens_get", "Read high-g acceleration data from H3LIS331 sensor",      true,  NULL, CMD_H3LSens_Get },
+    { "Sensor","bme_sens_get", "Read BME280 sensor [0=all, 1=temp, 2=RH, 3=pressure]",     true,  NULL, CMD_BMESens_Get },
+    { "Sensor","h250_sens_get","Read CO₂ concentration from H-250(G)-3V sensor",          false, NULL, CMD_H250Sens_Get },
+    { "Sensor","k33_sens_get", "Read CO₂ concentration from K33 ICB-F 10% sensor",        false, NULL, CMD_K33Sens_Get },
+
+    // Flow sensor (SFC series)
+    { "Sensor","sfc_flow_get", "Read current flow rate from SFC5500-50sccm [reserved]",   true,  NULL, CMD_SFC_Flow_Get },
+    { "Sensor","sfc_dev_inf",  "Read SFC device information [reserved]",                  false, NULL, CMD_SFC_Dev_Inf },
 };
 
 /*************************************************
@@ -149,19 +179,28 @@ static void CMD_Reset(EmbeddedCli *cli, char *args, void *context) {
 static void CMD_NTC_Get_Temp(EmbeddedCli *cli, char *args, void *context) {
     // TODO: Implement NTC temperature get logic
 	const char *arg1 = embeddedCliGetToken(args, 1);
-	if (*arg1 == 'a') {
+	if (*arg1 == 'a' || *arg1 == '\0') {
 		int16_t temp = 0;
-		char buffer[80];
+		char buffer[80] = "ntc:";
+		char tempo_buf[10];
 		NTC_get_temperature(NTC_Temperature);
 		for (uint8_t channel = 0; channel < 8; channel++) {
 			temp = NTC_Temperature[channel];
 			if (temp == 0x7FFF) {
-				snprintf(buffer, sizeof(buffer), "--> NTC[%d] is fail", channel);
+				snprintf(tempo_buf, sizeof(tempo_buf), "f ");
 			} else {
-				snprintf(buffer, sizeof(buffer), "--> NTC[%d]: %i", channel, temp);
+				snprintf(tempo_buf, sizeof(tempo_buf), "%i ", temp);
 			}
-			embeddedCliPrint(cli, buffer);
+			strcat(buffer, tempo_buf);
 		}
+
+		size_t len = strlen(buffer);
+		if (len >= 1 && buffer[len - 1] == ' ') {
+		    buffer[len - 1] = '\0';
+		}
+
+		strcat(buffer, "(C)");
+		embeddedCliPrint(cli, buffer);
 	}
 	else if (*arg1 == '0' || *arg1 == '1' || *arg1 == '2' || *arg1 == '3' || *arg1 == '4' || *arg1 == '5' || *arg1 == '6' || *arg1 == '7') {
 		int channel = atoi(arg1);
@@ -169,9 +208,9 @@ static void CMD_NTC_Get_Temp(EmbeddedCli *cli, char *args, void *context) {
 		NTC_get_temperature(NTC_Temperature);
 		int16_t temp = NTC_Temperature[channel];
 		if (temp == 0x7FFF) {
-			snprintf(buffer, sizeof(buffer), "--> NTC[%d] is fail", channel);
+			snprintf(buffer, sizeof(buffer), "ntc[%d]:f", channel);
 		} else {
-			snprintf(buffer, sizeof(buffer), "--> NTC[%d]: %i", channel, temp);
+			snprintf(buffer, sizeof(buffer), "ntc[%d]:%i(C)", channel, temp);
 		}
 		embeddedCliPrint(cli, buffer);
 	}
@@ -183,21 +222,21 @@ static void CMD_PWR_5V_Set(EmbeddedCli *cli, char *args, void *context) {
 	s_Temperature_CurrentState.Pwr_status = (uint8_t)atoi(arg1);
 	if (s_Temperature_CurrentState.Pwr_status) {
 		LL_GPIO_SetOutputPin(EF_5_EN_GPIO_Port, EF_5_EN_Pin);
-		embeddedCliPrint(cli, "--> Power for temp is on");
+		embeddedCliPrint(cli, "Pwr 5V: on");
 	}
 	else {
 		LL_GPIO_ResetOutputPin(EF_5_EN_GPIO_Port, EF_5_EN_Pin);
-		embeddedCliPrint(cli, "--> Power for temp is off");
+		embeddedCliPrint(cli, "Pwr 5V: off");
 	}
 	embeddedCliPrint(cli, "");
 }
 
 static void CMD_PWR_5V_Get(EmbeddedCli *cli, char *args, void *context) {
 	if (s_Temperature_CurrentState.Pwr_status) {
-		embeddedCliPrint(cli, "--> Power for temp is on");
+		embeddedCliPrint(cli, "Pwr 5V: on");
 	}
 	else {
-		embeddedCliPrint(cli, "--> Power for temp is off");
+		embeddedCliPrint(cli, "Pwr 5V: off");
 	}
 	embeddedCliPrint(cli, "");
 }
@@ -209,7 +248,7 @@ static void CMD_TEC_Init(EmbeddedCli *cli, char *args, void *context) {
 	int8_t tec_init_channel = 0;
 	struct lt8722_dev *p_tec_dev;
 	struct lt8722_dev *p_tec_dev_table[] = {&tec_0, &tec_1, &tec_2, &tec_3};
-	if (*arg1 == 'a') {
+	if (*arg1 == 'a' || *arg1 == '\0') {
 		/* Init TEC 0 -> 3 */
 		for (uint8_t channel = 0; channel < 4; channel++) {
 			p_tec_dev = p_tec_dev_table[channel];
@@ -218,10 +257,10 @@ static void CMD_TEC_Init(EmbeddedCli *cli, char *args, void *context) {
 			// if init is success
 			if (!tec_init_channel) {
 				lt8722_set_swen_req(p_tec_dev, LT8722_SWEN_REQ_DISABLED);
-				snprintf(buffer, sizeof(buffer), "--> Tec %d init success", channel);
+				snprintf(buffer, sizeof(buffer), "Tec %d init success", channel);
 			}
 			else
-				snprintf(buffer, sizeof(buffer), "--> Tec %d init fail", channel);
+				snprintf(buffer, sizeof(buffer), "Tec %d init fail", channel);
 			embeddedCliPrint(cli, buffer);
 		}
 	}
@@ -233,10 +272,10 @@ static void CMD_TEC_Init(EmbeddedCli *cli, char *args, void *context) {
 		// if init is success
 		if (!tec_init_channel) {
 			lt8722_set_swen_req(p_tec_dev, LT8722_SWEN_REQ_DISABLED);
-			snprintf(buffer, sizeof(buffer), "--> Tec %d init success", channel);
+			snprintf(buffer, sizeof(buffer), "Tec %d init success", channel);
 		}
 		else
-			snprintf(buffer, sizeof(buffer), "--> Tec %d init fail", channel);
+			snprintf(buffer, sizeof(buffer), "Tec %d init fail", channel);
 		embeddedCliPrint(cli, buffer);
 	}
 	embeddedCliPrint(cli, "");
@@ -257,9 +296,9 @@ static void CMD_TEC_Set_Volt(EmbeddedCli *cli, char *args, void *context) {
 	for (uint8_t i = 0; i < 4; i++) {
 		temperature_set_tec_vol(i, volt[i]);
 		if (volt[i] > 3000)
-			snprintf(buffer, sizeof(buffer), "--> Tec[%d]: set %i mV OverVolt --> Tec[%d]: set 3000 mV", i, volt[i], i);
+			snprintf(buffer, sizeof(buffer), "Tec[%d]: set %i mV OverVolt --> Tec[%d]: set 3000 mV", i, volt[i], i);
 		else
-			snprintf(buffer, sizeof(buffer), "--> Tec[%d]: set %i mV", i, volt[i]);
+			snprintf(buffer, sizeof(buffer), "Tec[%d]: set %i mV", i, volt[i]);
 		embeddedCliPrint(cli, buffer);
 	}
 	embeddedCliPrint(cli, "");
@@ -271,12 +310,12 @@ static void CMD_TEC_Get_Volt(EmbeddedCli *cli, char *args, void *context) {
 	char buffer[60];
 	uint16_t vol_set = 0;
 	uint16_t vol_adc = 0;
-	if (*arg1 == 'a') {
+	if (*arg1 == 'a' || *arg1 == '\0') {
 		char buffer[80];
 		for (uint8_t i = 0; i < 4; i++) {
 			vol_set = temperature_get_tec_vol_set(i);
 			vol_adc = temperature_get_tec_vol_adc(i);
-			snprintf(buffer, sizeof(buffer), "--> Tec[%d]: set %imV, ADC %imV", i, vol_set, vol_adc);
+			snprintf(buffer, sizeof(buffer), "Tec[%d]: set %imV, ADC %imV", i, vol_set, vol_adc);
 			embeddedCliPrint(cli, buffer);
 		}
 	}
@@ -284,7 +323,7 @@ static void CMD_TEC_Get_Volt(EmbeddedCli *cli, char *args, void *context) {
 		int channel = atoi(arg1);
 		vol_set = temperature_get_tec_vol_set(channel);
 		vol_adc = temperature_get_tec_vol_adc(channel);
-		snprintf(buffer, sizeof(buffer), "--> Tec[%d]: set %imV, ADC %imV", channel, vol_set, vol_adc);
+		snprintf(buffer, sizeof(buffer), "Tec[%d]: set %imV, ADC %imV", channel, vol_set, vol_adc);
 		embeddedCliPrint(cli, buffer);
 	}
 	embeddedCliPrint(cli, "");
@@ -301,14 +340,14 @@ static void CMD_TEC_Set_Dir(EmbeddedCli *cli, char *args, void *context) {
 	tec_dir_t dir_2 = atoi(arg3) ? TEC_HEAT : TEC_COOL;
 	tec_dir_t dir_3 = atoi(arg4) ? TEC_HEAT : TEC_COOL;
 	temperature_set_tec_dir(dir_0, dir_1, dir_2, dir_3);
-	if (dir_0 == TEC_COOL) embeddedCliPrint(cli, "--> TEC 0 set cool mode");
-	else embeddedCliPrint(cli, "--> TEC 0 set heat mode");
-	if (dir_1 == TEC_COOL) embeddedCliPrint(cli, "--> TEC 1 set cool mode");
-	else embeddedCliPrint(cli, "--> TEC 1 set heat mode");
-	if (dir_2 == TEC_COOL) embeddedCliPrint(cli, "--> TEC 2 set cool mode");
-	else embeddedCliPrint(cli, "--> TEC 2 set heat mode");
-	if (dir_3 == TEC_COOL) embeddedCliPrint(cli, "--> TEC 3 set cool mode");
-	else embeddedCliPrint(cli, "--> TEC 3 set heat mode");
+	if (dir_0 == TEC_COOL) embeddedCliPrint(cli, "TEC 0 set cool mode");
+	else embeddedCliPrint(cli, "TEC 0 set heat mode");
+	if (dir_1 == TEC_COOL) embeddedCliPrint(cli, "TEC 1 set cool mode");
+	else embeddedCliPrint(cli, "TEC 1 set heat mode");
+	if (dir_2 == TEC_COOL) embeddedCliPrint(cli, "TEC 2 set cool mode");
+	else embeddedCliPrint(cli, "TEC 2 set heat mode");
+	if (dir_3 == TEC_COOL) embeddedCliPrint(cli, "TEC 3 set cool mode");
+	else embeddedCliPrint(cli, "TEC 3 set heat mode");
 	embeddedCliPrint(cli, "");
 }
 
@@ -317,23 +356,23 @@ static void CMD_TEC_Get_Dir(EmbeddedCli *cli, char *args, void *context) {
 	const char *arg1 = embeddedCliGetToken(args, 1);
 	tec_dir_t dir[4] = {TEC_COOL, TEC_COOL, TEC_COOL, TEC_COOL};
 	temperature_get_tec_dir(&dir[0], &dir[1], &dir[2], &dir[3]);
-	if (*arg1 == 'a') {
-		if (dir[0] == TEC_COOL) embeddedCliPrint(cli, "--> TEC 0 is cool mode");
-		else embeddedCliPrint(cli, "--> TEC 0 is heat mode");
-		if (dir[1] == TEC_COOL) embeddedCliPrint(cli, "--> TEC 1 is cool mode");
-		else embeddedCliPrint(cli, "--> TEC 1 is heat mode");
-		if (dir[2] == TEC_COOL) embeddedCliPrint(cli, "--> TEC 2 is cool mode");
-		else embeddedCliPrint(cli, "--> TEC 2 is heat mode");
-		if (dir[3] == TEC_COOL) embeddedCliPrint(cli, "--> TEC 3 is cool mode");
-		else embeddedCliPrint(cli, "--> TEC 3 is heat mode");
+	if (*arg1 == 'a' || *arg1 == '\0') {
+		if (dir[0] == TEC_COOL) embeddedCliPrint(cli, "TEC 0 is cool mode");
+		else embeddedCliPrint(cli, "TEC 0 is heat mode");
+		if (dir[1] == TEC_COOL) embeddedCliPrint(cli, "TEC 1 is cool mode");
+		else embeddedCliPrint(cli, "TEC 1 is heat mode");
+		if (dir[2] == TEC_COOL) embeddedCliPrint(cli, "TEC 2 is cool mode");
+		else embeddedCliPrint(cli, "TEC 2 is heat mode");
+		if (dir[3] == TEC_COOL) embeddedCliPrint(cli, "TEC 3 is cool mode");
+		else embeddedCliPrint(cli, "TEC 3 is heat mode");
 	}
 	else if (*arg1 == '0' || *arg1 == '1' || *arg1 == '2' || *arg1 == '3') {
 		char buffer[40];
 		int channel = atoi(arg1);
 		if (dir[channel] == TEC_COOL)
-			snprintf(buffer, sizeof(buffer), "--> TEC %d is cool mode", channel);
+			snprintf(buffer, sizeof(buffer), "TEC %d is cool mode", channel);
 		else
-			snprintf(buffer, sizeof(buffer), "--> TEC %d is heat mode", channel);
+			snprintf(buffer, sizeof(buffer), "TEC %d is heat mode", channel);
 		embeddedCliPrint(cli, buffer);
 	}
 	embeddedCliPrint(cli, "");
@@ -354,7 +393,7 @@ static void CMD_HTR_Set_Duty(EmbeddedCli *cli, char *args, void *context) {
 	for (uint8_t i = 0; i < 4; i++) {
 		if (duty[i] > 100) duty[i] = 100;
 		temperature_set_heater_duty(i, duty[i]);
-		snprintf(buffer, sizeof(buffer), "--> Heater duty[%d]: %i%%", i, duty[i]);
+		snprintf(buffer, sizeof(buffer), "Heater duty[%d]: %i%%", i, duty[i]);
 		embeddedCliPrint(cli, buffer);
 	}
 	embeddedCliPrint(cli, "");
@@ -365,17 +404,17 @@ static void CMD_HTR_Get_Duty(EmbeddedCli *cli, char *args, void *context) {
 	const char *arg1 = embeddedCliGetToken(args, 1);
 	char buffer[60];
 	uint8_t duty;
-	if (*arg1 == 'a') {
+	if (*arg1 == 'a' || *arg1 == '\0') {
 		for (uint8_t i = 0; i < 4; i++) {
 			duty = temperature_get_heater_duty(i);
-			snprintf(buffer, sizeof(buffer), "--> Heater duty[%d]: %i%%", i, duty);
+			snprintf(buffer, sizeof(buffer), "Heater duty[%d]: %i%%", i, duty);
 			embeddedCliPrint(cli, buffer);
 		}
 	}
 	else if (*arg1 == '0' || *arg1 == '1' || *arg1 == '2' || *arg1 == '3') {
 		int channel = atoi(arg1);
 		duty = temperature_get_heater_duty(channel);
-		snprintf(buffer, sizeof(buffer), "--> Heater duty[%d]: %i%%", channel, duty);
+		snprintf(buffer, sizeof(buffer), "Heater duty[%d]: %i%%", channel, duty);
 		embeddedCliPrint(cli, buffer);
 	}
 	embeddedCliPrint(cli, "");
@@ -387,7 +426,7 @@ static void CMD_Ref_Set_Temp(EmbeddedCli *cli, char *args, void *context) {
 	int setpoint = atoi(arg1);
 	char buffer[40];
 	temperature_set_setpoint(setpoint);
-	snprintf(buffer, sizeof(buffer), "--> Reference Temperature: %.2f *C", (float)setpoint/10);
+	snprintf(buffer, sizeof(buffer), "Reference Temperature: %.2f *C", (float)setpoint/10);
 	embeddedCliPrint(cli, buffer);
 	embeddedCliPrint(cli, "");
 }
@@ -396,7 +435,7 @@ static void CMD_Ref_Get_Temp(EmbeddedCli *cli, char *args, void *context) {
     // TODO: Implement reference temperature get logic
 	char buffer[60];
 	int16_t setpoint = temperature_get_setpoint();
-	snprintf(buffer, sizeof(buffer), "--> Reference Temperature: %.2f *C", (float)setpoint/10);
+	snprintf(buffer, sizeof(buffer), "Reference Temperature: %.2f *C", (float)setpoint/10);
 	embeddedCliPrint(cli, buffer);
 	embeddedCliPrint(cli, "");
 }
@@ -407,7 +446,7 @@ static void CMD_Ref_Set_NTC(EmbeddedCli *cli, char *args, void *context) {
 	int NTC_Ref = atoi(arg1);
 	temperature_set_ntc_ref(NTC_Ref);
 	char buffer[60];
-	snprintf(buffer, sizeof(buffer), "--> NTC Ref is %d", NTC_Ref);
+	snprintf(buffer, sizeof(buffer), "NTC Ref is %d", NTC_Ref);
 	embeddedCliPrint(cli, buffer);
 	embeddedCliPrint(cli, "");
 }
@@ -417,7 +456,7 @@ static void CMD_Ref_Get_NTC(EmbeddedCli *cli, char *args, void *context) {
 	uint8_t NTC_Ref = 0;
 	temperature_get_ntc_ref(&NTC_Ref);
 	char buffer[60];
-	snprintf(buffer, sizeof(buffer), "--> NTC Ref is %d", NTC_Ref);
+	snprintf(buffer, sizeof(buffer), "NTC Ref is %d", NTC_Ref);
 	embeddedCliPrint(cli, buffer);
 	embeddedCliPrint(cli, "");
 }
@@ -435,19 +474,19 @@ static void CMD_TEC_Set_Auto(EmbeddedCli *cli, char *args, void *context) {
 	temperature_set_tec_auto(tec_0_en, tec_1_en, tec_2_en, tec_3_en);
 	char buffer[60];
 	if (tec_0_en) {
-		snprintf(buffer, sizeof(buffer), "--> TEC 0 is ena");
+		snprintf(buffer, sizeof(buffer), "TEC 0 is ena");
 		embeddedCliPrint(cli, buffer);
 	}
 	if (tec_1_en) {
-		snprintf(buffer, sizeof(buffer), "--> TEC 1 is ena");
+		snprintf(buffer, sizeof(buffer), "TEC 1 is ena");
 		embeddedCliPrint(cli, buffer);
 	}
 	if (tec_2_en) {
-		snprintf(buffer, sizeof(buffer), "--> TEC 2 is ena");
+		snprintf(buffer, sizeof(buffer), "TEC 2 is ena");
 		embeddedCliPrint(cli, buffer);
 	}
 	if (tec_3_en) {
-		snprintf(buffer, sizeof(buffer), "--> TEC 3 is ena");
+		snprintf(buffer, sizeof(buffer), "TEC 3 is ena");
 		embeddedCliPrint(cli, buffer);
 	}
 	embeddedCliPrint(cli, "");
@@ -459,21 +498,21 @@ static void CMD_TEC_Get_Auto(EmbeddedCli *cli, char *args, void *context) {
 	uint8_t tec_en[4];
 	temperature_get_tec_auto(&tec_en[0], &tec_en[1], &tec_en[2], &tec_en[3]);
 	char buffer[60];
-	if (*arg1 == 'a') {
+	if (*arg1 == 'a' || *arg1 == '\0') {
 		for (uint8_t channel = 0; channel < 4; channel++) {
 			if (tec_en[channel])
-				snprintf(buffer, sizeof(buffer), "--> TEC %d is ena", channel);
+				snprintf(buffer, sizeof(buffer), "TEC %d is ena", channel);
 			else
-				snprintf(buffer, sizeof(buffer), "--> TEC %d is dis", channel);
+				snprintf(buffer, sizeof(buffer), "TEC %d is dis", channel);
 			embeddedCliPrint(cli, buffer);
 		}
 	}
 	else if (*arg1 == '0' || *arg1 == '1' || *arg1 == '2' || *arg1 == '3') {
 		int channel = atoi(arg1);
 		if (tec_en[channel])
-			snprintf(buffer, sizeof(buffer), "--> TEC %d is ena", channel);
+			snprintf(buffer, sizeof(buffer), "TEC %d is ena", channel);
 		else
-			snprintf(buffer, sizeof(buffer), "--> TEC %d is dis", channel);
+			snprintf(buffer, sizeof(buffer), "TEC %d is dis", channel);
 		embeddedCliPrint(cli, buffer);
 	}
 	embeddedCliPrint(cli, "");
@@ -490,7 +529,7 @@ static void CMD_HTR_Set_Auto(EmbeddedCli *cli, char *args, void *context) {
 	char buffer[60];
 	for (uint8_t channel = 0; channel < 4; channel++) {
 		if (htr_en[channel]) {
-			snprintf(buffer, sizeof(buffer), "--> Heater %d is ena", channel);
+			snprintf(buffer, sizeof(buffer), "Heater %d is ena", channel);
 			embeddedCliPrint(cli, buffer);
 		}
 	}
@@ -503,21 +542,21 @@ static void CMD_HTR_Get_Auto(EmbeddedCli *cli, char *args, void *context) {
 	uint8_t htr_en[4];
 	temperature_get_heater_auto(&htr_en[0], &htr_en[1], &htr_en[2], &htr_en[3]);
 	char buffer[60];
-	if (*arg1 == 'a') {
+	if (*arg1 == 'a' || *arg1 == '\0') {
 		for (uint8_t channel = 0; channel < 4; channel++) {
 			if (htr_en[channel])
-				snprintf(buffer, sizeof(buffer), "--> Heater %d is ena", channel);
+				snprintf(buffer, sizeof(buffer), "Heater %d is ena", channel);
 			else
-				snprintf(buffer, sizeof(buffer), "--> Heater %d is dis", channel);
+				snprintf(buffer, sizeof(buffer), "Heater %d is dis", channel);
 			embeddedCliPrint(cli, buffer);
 		}
 	}
 	else if (*arg1 == '0' || *arg1 == '1' || *arg1 == '2' || *arg1 == '3') {
 		int channel = atoi(arg1);
 		if (htr_en[channel])
-			snprintf(buffer, sizeof(buffer), "--> Heater %d is ena", channel);
+			snprintf(buffer, sizeof(buffer), "Heater %d is ena", channel);
 		else
-			snprintf(buffer, sizeof(buffer), "--> Heater %d is dis", channel);
+			snprintf(buffer, sizeof(buffer), "Heater %d is dis", channel);
 		embeddedCliPrint(cli, buffer);
 	}
 	embeddedCliPrint(cli, "");
@@ -546,21 +585,69 @@ static void CMD_Temp_Get_Auto(EmbeddedCli *cli, char *args, void *context) {
 	embeddedCliPrint(cli, "");
 }
 
+
+static void CMD_Sens_List(EmbeddedCli *cli, char *args, void *context) {
+	// TODO:
+	char buffer[100];
+	NTC_get_temperature(NTC_Temperature);
+	int16_t temp;
+	for (uint8_t channel = 0; channel < 8; channel++) {
+		temp = NTC_Temperature[channel];
+		if (temp != 0x7FFF) {
+			Sensor_list.ntc = 1;
+			break;
+		}
+	}
+	Sensor_I2C_Init();
+	strcpy(buffer, "sensor:");
+	if (Sensor_list.ntc) {
+		strcat(buffer, "ntc,");
+	}
+	if (Sensor_list.lsm) {
+		strcat(buffer, "lsm,");
+	}
+	if (Sensor_list.bmp) {
+		strcat(buffer, "bmp,");
+	}
+	if (Sensor_list.bme) {
+		strcat(buffer, "bme,");
+	}
+	if (Sensor_list.h3l) {
+		strcat(buffer, "h3l,");
+	}
+	if (Sensor_list.h250) {
+		strcat(buffer, "h250,");
+	}
+	if (Sensor_list.k33) {
+		strcat(buffer, "k33,");
+	}
+	if (Sensor_list.sfc) {
+		strcat(buffer, "sfc,");
+	}
+
+	size_t len = strlen(buffer);
+	if (len >= 1 && buffer[len - 1] == ',') {
+	    buffer[len - 1] = '\0';
+	}
+
+	embeddedCliPrint(cli, buffer);
+	embeddedCliPrint(cli, "");
+}
+
 static void CMD_LSMSens_Get(EmbeddedCli *cli, char *args, void *context) {
     // TODO: Implement LSM sensor get logic
 	LSM6DSOX_Read_Data(&LSM6DSOX_Data);
     char buffer[80];
 
     const char *arg1 = embeddedCliGetToken(args, 1);
-	int option = atoi(arg1);
-	if (option == 0)
-		snprintf(buffer, sizeof(buffer), "Accel: %d %d %d (g)\r\nGyro: %d %d %d (dps)",
+	if (*arg1 == 'a' || *arg1 == '\0')
+		snprintf(buffer, sizeof(buffer), "accel:%d %d %d(g),gyro:%d %d %d(dps)",
 								LSM6DSOX_Data.Accel.x, LSM6DSOX_Data.Accel.y, LSM6DSOX_Data.Accel.z,
 								LSM6DSOX_Data.Gyro.x, LSM6DSOX_Data.Gyro.y, LSM6DSOX_Data.Gyro.z);
-	else if (option == 1)
-		snprintf(buffer, sizeof(buffer), "Accel: %d %d %d (g)", LSM6DSOX_Data.Accel.x, LSM6DSOX_Data.Accel.y, LSM6DSOX_Data.Accel.z);
-	else if (option == 2)
-		snprintf(buffer, sizeof(buffer), "Gyro: %d %d %d (dps)", LSM6DSOX_Data.Gyro.x, LSM6DSOX_Data.Gyro.y, LSM6DSOX_Data.Gyro.z);
+	else if (*arg1 == '0')
+		snprintf(buffer, sizeof(buffer), "accel:%d %d %d(g)", LSM6DSOX_Data.Accel.x, LSM6DSOX_Data.Accel.y, LSM6DSOX_Data.Accel.z);
+	else if (*arg1 == '1')
+		snprintf(buffer, sizeof(buffer), "gyro:%d %d %d(dps)", LSM6DSOX_Data.Gyro.x, LSM6DSOX_Data.Gyro.y, LSM6DSOX_Data.Gyro.z);
 	embeddedCliPrint(cli, buffer);
 	embeddedCliPrint(cli, "");
 }
@@ -569,7 +656,7 @@ static void CMD_H3LSens_Get(EmbeddedCli *cli, char *args, void *context) {
     // TODO: Implement H3L sensor get logic
 	H3LIS331DL_Get_Accel(&H3LIS331DL_Data);
 	char buffer[50];
-	snprintf(buffer, sizeof(buffer), "Accel: %d %d %d (g)", (int16_t)H3LIS331DL_Data.x, (int16_t)H3LIS331DL_Data.y, (int16_t)H3LIS331DL_Data.z);
+	snprintf(buffer, sizeof(buffer), "accel:%d %d %d(g)", (int16_t)H3LIS331DL_Data.x, (int16_t)H3LIS331DL_Data.y, (int16_t)H3LIS331DL_Data.z);
 	embeddedCliPrint(cli, buffer);
 	embeddedCliPrint(cli, "");
 }
@@ -577,18 +664,17 @@ static void CMD_H3LSens_Get(EmbeddedCli *cli, char *args, void *context) {
 static void CMD_BMESens_Get(EmbeddedCli *cli, char *args, void *context) {
     // TODO: Implement BME sensor get logic
 	BME280_Read_Data(&BME280_Data);
-	char buffer[50];
+	char buffer[80];
 
 	const char *arg1 = embeddedCliGetToken(args, 1);
-	int option = atoi(arg1);
-	if (option == 0)
-		snprintf(buffer, sizeof(buffer), "Temp: %.2f *C \r\nHumi: %.2f %%RH \r\nPress: %.2f hPa", BME280_Data.temperature, BME280_Data.humidity, BME280_Data.pressure);
-	else if (option == 1)
-		snprintf(buffer, sizeof(buffer), "Temp: %.2f *C", BME280_Data.temperature);
-	else if (option == 2)
-		snprintf(buffer, sizeof(buffer), "Humi: %.2f %%RH", BME280_Data.humidity);
-	else if (option == 3)
-		snprintf(buffer, sizeof(buffer), "Press: %.2f hPa", BME280_Data.pressure);
+	if (*arg1 == 'a' || *arg1 == '\0')
+		snprintf(buffer, sizeof(buffer), "temp:%.2f(C),humid:%.2f(%%),press:%.2f(hPa)", BME280_Data.temperature, BME280_Data.humidity, BME280_Data.pressure);
+	else if (*arg1 == '0')
+		snprintf(buffer, sizeof(buffer), "temp:%.2f(C)", BME280_Data.temperature);
+	else if (*arg1 == '1')
+		snprintf(buffer, sizeof(buffer), "humid:%.2f(%%)", BME280_Data.humidity);
+	else if (*arg1 == '2')
+		snprintf(buffer, sizeof(buffer), "press:%.2f(hPa)", BME280_Data.pressure);
 	embeddedCliPrint(cli, buffer);
 	embeddedCliPrint(cli, "");
 }
@@ -597,7 +683,7 @@ static void CMD_H250Sens_Get(EmbeddedCli *cli, char *args, void *context) {
 	// TODO: Implement H250 sensor get logic
 	H250_I2C_Read_Data(&H250_I2C_Data);
 	char buffer[30];
-	snprintf(buffer, sizeof(buffer), "CO2: %.2f %%", (float)H250_I2C_Data/100.0f);
+	snprintf(buffer, sizeof(buffer), "co2:%.2f(%%)", (float)H250_I2C_Data/100.0f);
 	embeddedCliPrint(cli, buffer);
 	embeddedCliPrint(cli, "");
 }
@@ -605,19 +691,57 @@ static void CMD_H250Sens_Get(EmbeddedCli *cli, char *args, void *context) {
 static void CMD_K33Sens_Get(EmbeddedCli *cli, char *args, void *context) {
     // TODO: Implement K33 sensor get logic
 	K33_Read_Data(&K33_Data);
-	char buffer[50];
+	char buffer[80];
 
 	const char *arg1 = embeddedCliGetToken(args, 1);
-	int option = atoi(arg1);
-	if (option == 0)
-		snprintf(buffer, sizeof(buffer), "CO2: %.2f %% \r\nTemp: %.2f *C \r\nHumi: %.2f %%RH", (float)(K33_Data.CO2/1000.0f), (float)(K33_Data.Temp/100.0f), (float)(K33_Data.RH/100.0f));
-	else if (option == 1)
-		snprintf(buffer, sizeof(buffer), "CO2: %.2f %%", (float)(K33_Data.CO2/1000.0f));
-	else if (option == 2)
-		snprintf(buffer, sizeof(buffer), "Temp: %.2f *C", (float)(K33_Data.Temp/100.0f));
-	else if (option == 3)
-		snprintf(buffer, sizeof(buffer), "Humi: %.2f %%RH", (float)(K33_Data.RH/100.0f));
+	if (*arg1 == 'a' || *arg1 == '\0')
+		snprintf(buffer, sizeof(buffer), "co2:%.2f(%%),temp:%.2f(C),humid:%.2f(%%)", (float)(K33_Data.CO2/1000.0f), (float)(K33_Data.Temp/100.0f), (float)(K33_Data.RH/100.0f));
+	else if (*arg1 == '0')
+		snprintf(buffer, sizeof(buffer), "co2:%.2f(%%)", (float)(K33_Data.CO2/1000.0f));
+	else if (*arg1 == '1')
+		snprintf(buffer, sizeof(buffer), "temp:%.2f(C)", (float)(K33_Data.Temp/100.0f));
+	else if (*arg1 == '2')
+		snprintf(buffer, sizeof(buffer), "humid:%.2f(%%)", (float)(K33_Data.RH/100.0f));
 	embeddedCliPrint(cli, buffer);
+	embeddedCliPrint(cli, "");
+}
+
+static void CMD_Ref_Set_NFC(EmbeddedCli *cli, char *args, void *context) {
+	// TODO:
+	const char *arg1 = embeddedCliGetToken(args, 1);
+	int percent = atoi(arg1);
+	float setpoint = (float)percent/100.0f;
+	SFC5500_SetSetpoint(&sfc_handle, SFC5500_SCALE_NORMALIZED, setpoint);
+	char buffer[30];
+	snprintf(buffer, sizeof(buffer), "nfc5500's setpoint:%d(%%)", percent);
+	embeddedCliPrint(cli, buffer);
+	embeddedCliPrint(cli, "");
+}
+static void CMD_Ref_Get_NFC(EmbeddedCli *cli, char *args, void *context) {
+	// TODO:
+	float setpoint = 1.0f;
+	SFC5500_GetSetpoint(&sfc_handle, SFC5500_SCALE_NORMALIZED, &setpoint);
+	uint8_t percent = setpoint*100;
+	char buffer[30];
+	snprintf(buffer, sizeof(buffer), "nfc5500's setpoint:%d(%%)", percent);
+	embeddedCliPrint(cli, buffer);
+	embeddedCliPrint(cli, "");
+}
+static void CMD_SFC_Flow_Get(EmbeddedCli *cli, char *args, void *context) {
+	// TODO:
+	float measured_flow = 0.0f;
+	SFC5500_ReadMeasuredFlow(&sfc_handle, SFC5500_SCALE_NORMALIZED, &measured_flow);
+	uint8_t percent = measured_flow*100;
+	char buffer[30];
+	snprintf(buffer, sizeof(buffer), "nfc5500's flow:%d(%%)", percent);
+	embeddedCliPrint(cli, buffer);
+	embeddedCliPrint(cli, "");
+}
+
+static void CMD_SFC_Dev_Inf(EmbeddedCli *cli, char *args, void *context) {
+	char product_name[30];
+	SFC5500_GetDeviceInfo(&sfc_handle, product_name);
+	embeddedCliPrint(cli, product_name);
 	embeddedCliPrint(cli, "");
 }
 /*************************************************

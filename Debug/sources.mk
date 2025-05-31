@@ -37,12 +37,9 @@ Core/CLI_Terminal/CLI_Src \
 Core/DateTime \
 Core/Devices/ADG1414 \
 Core/Devices/MB85RS2MT \
-Core/LASER_BOARD/MCP4902 \
-Core/LASER_BOARD \
+Core/Devices/SFC5500 \
 Core/LED/IR_LED \
 Core/LED/Status_LED \
-Core/PHOTO_BOARD/ADS8327 \
-Core/PHOTO_BOARD \
 Core/Sensor_I2C/BME280 \
 Core/Sensor_I2C/BMP390 \
 Core/Sensor_I2C/H250 \
