@@ -14,6 +14,7 @@
 #include "board.h"
 
 
+
 static uint8_t tx_buffer[SFC5500_TX_BUFFER_SIZE];
 static uint8_t rx_buffer[SFC5500_RX_BUFFER_SIZE];
 static volatile uint8_t rx_index = 0;
